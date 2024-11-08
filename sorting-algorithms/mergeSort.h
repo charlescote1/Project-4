@@ -9,7 +9,7 @@ void mergeSortRec(vector<Comparable> &vec, int startIndex, int endIndex, vector<
     if (startIndex >= endIndex) {
         return;
     }
-
+    allocations += sizeof(i) + sizeof(leftIndex) + sizeof(rightIndex);
     // Recursive calls for the left and right halves
     int centerIndex = (startIndex + endIndex) / 2;
     mergeSortRec(vec, startIndex, centerIndex,temp, i, leftIndex, rightIndex, reads, allocations);
@@ -21,11 +21,17 @@ void mergeSortRec(vector<Comparable> &vec, int startIndex, int endIndex, vector<
     rightIndex = centerIndex + 1;
     // While leftIndex and rightIndex are in bounds of their half
     while (leftIndex <= centerIndex && rightIndex <= endIndex) {
+        ++reads;
+        ++reads;
         if (vec[leftIndex] <= vec[rightIndex]) {
             temp[i] = vec[leftIndex];
+            ++reads;
+            ++allocations += sizeof(temp[i]);
             ++leftIndex;
         } else {
             temp[i] = vec[rightIndex];
+            ++reads;
+            ++allocations += sizeof(temp[i]);
             ++rightIndex;
         }
         ++i;
@@ -33,11 +39,15 @@ void mergeSortRec(vector<Comparable> &vec, int startIndex, int endIndex, vector<
     // Now one of the halves is empty and the other half has at least one element left to copy into temp
     while (leftIndex <= centerIndex) {
         temp[i] = vec[leftIndex];
+        ++reads;
+        ++allocations += sizeof(temp[i]);
         ++leftIndex;
         ++i;
     }
     while (rightIndex <= endIndex) {
         temp[i] = vec[rightIndex];
+        ++reads;
+        ++allocations += sizeof(temp[i]);
         ++rightIndex;
         ++i;
     }
@@ -45,6 +55,8 @@ void mergeSortRec(vector<Comparable> &vec, int startIndex, int endIndex, vector<
     // Copy everything from temp back into vec
     for (i = 0; i <= endIndex-startIndex; ++i) {
         vec[i + startIndex] = temp[i];
+        ++reads;
+        ++allocations += sizeof(vec[i + startIndex]);
     }
 
     // Uncomment this line if you want to see each iteration
@@ -56,6 +68,7 @@ vector<Comparable> mergeSort(vector<Comparable> vec, unsigned long& reads, unsig
     reads = allocations = 0;
     vector<Comparable> temp(vec.size());
     int i, leftIndex, rightIndex;
+    allocations += sizeof(temp) + sizeof(i) + sizeof(leftIndex) + sizeof(rightIndex);
     mergeSortRec(vec, 0, vec.size() - 1, temp, i, leftIndex, rightIndex, reads, allocations);
     return vec;
 }

@@ -12,16 +12,22 @@ void quickSortUnstableRec(vector<Comparable> &vec, int startIndex, int endIndex,
 
     // Choose a partition element
     partition = vec[startIndex];
+    ++reads;
 
     // Loop through vec from startIndex to endIndex
     // Keep track of where the > partition elements start
     largerElementIndex = startIndex+1;
     for (i = startIndex+1; i <= endIndex; ++i) {
+        ++reads;
+        ++reads;
         if (vec[i] <= partition) {
             // Swap the smaller/equal item to the left of the larger items
             temp = vec[i];
+            ++reads;
             vec[i] = vec[largerElementIndex];
+            ++reads;
             vec[largerElementIndex] = temp;
+            allocations += 3 * sizeof(Comparable);
             // Update largerElementIndex
             ++largerElementIndex;
         }
@@ -29,8 +35,11 @@ void quickSortUnstableRec(vector<Comparable> &vec, int startIndex, int endIndex,
     // Swap the partition element into place
     if (startIndex != largerElementIndex-1) {
         temp = vec[startIndex];
+        ++reads;
         vec[startIndex] = vec[largerElementIndex - 1];
+        ++reads;
         vec[largerElementIndex - 1] = temp;
+        allocations += 3 * sizeof(Comparable);
     }
 
     // Uncomment this line if you want to see each iteration
@@ -59,17 +68,32 @@ void quickSortStableRec(vector<Comparable> &vec, unsigned long& reads, unsigned 
 
     // Choose a partition element
     Comparable partition = vec[0];
+    ++reads;
+    allocations += sizeof(partition);
 
     vector<Comparable> smaller, equal, larger;
+    allocations += sizeof(smaller) + sizeof(equal) + sizeof(larger);
     // Loop through vec and populate smaller, equal, larger
     int i;
+    allocations += sizeof(i);
+
     for (i = 0; i < vec.size(); ++i) {
+        ++reads;
+        ++reads;
+
         if (vec[i] < partition) {
             smaller.push_back(vec[i]);
+            ++reads;
+            allocations += sizeof(Comparable);
+
         } else if (vec[i] > partition) {
             larger.push_back(vec[i]);
+            ++reads;
+            allocations += sizeof(Comparable);
         } else {
             equal.push_back(vec[i]);
+            ++reads;
+            allocations += sizeof(Comparable);
         }
     }
 
@@ -81,10 +105,16 @@ void quickSortStableRec(vector<Comparable> &vec, unsigned long& reads, unsigned 
     for (i = 0; i < vec.size(); ++i) {
         if (i < smaller.size()) {
             vec[i] = smaller[i];
+            ++reads;
+            allocations += sizeof(vec[i]);
         } else if (i < smaller.size() + equal.size()) {
             vec[i] = equal[i - smaller.size()];
+            ++reads;
+            allocations += sizeof(vec[i]);
         } else {
             vec[i] = larger[i - smaller.size() - equal.size()];
+            ++reads;
+            allocations += sizeof(vec[i]);
         }
     }
 
