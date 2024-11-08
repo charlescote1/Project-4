@@ -12,12 +12,17 @@ vector<Comparable> bubbleSort(vector<Comparable> vec, unsigned long& reads, unsi
     while (haveSwapped) {
         haveSwapped = false;
         for (i = 0; i+1 < vec.size()-numPasses; ++i) {
+            ++reads; // Adding two reads for the comparison below
+            ++reads;
             // Compare items at indices i and i+1 and swap if necessary
             if (vec[i] > vec[i+1]) {
                 temp = vec[i];
+                ++reads;
                 vec[i] = vec[i+1];
+                ++reads;
                 vec[i+1] = temp;
                 // Update haveSwapped
+                allocations += 3 * sizeof(Comparable);
                 haveSwapped = true;
             }
         }
